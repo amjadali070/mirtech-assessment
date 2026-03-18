@@ -29,6 +29,47 @@ Once the containers are healthy:
 
 ---
 
+## Getting Started Locally (Native)
+
+If you prefer to run the environment natively without Docker, ensure Python 3.10+ and Node.js are installed. You will also need active instances of PostgreSQL (port `5432`) and Redis (port `6379`) running.
+
+**1. Run the Backend API:**
+```bash
+cd backend
+python -m venv venv
+# Activate venv: .\venv\Scripts\activate (Windows) or source venv/bin/activate (Mac/Linux)
+pip install -r requirements.txt
+alembic upgrade head
+python scripts/seed.py
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+**2. Run the Frontend Client:**
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+## 📁 Core Project Structure
+
+The repository is explicitly split into standard architectural layers.
+
+### `backend/` (FastAPI / Python)
+*   **`api/endpoints.py`**: The REST API routes handling pagination, dynamic sorting, and multi-field filtering queries.
+*   **`models.py` & `schemas.py`**: SQLAlchemy table models and Pydantic validation schemas.
+*   **`cache.py`**: The asynchronous Redis caching integration mechanism.
+*   **`scripts/seed.py`**: The performance bulk-insertion generator using Faker to mock 100,000 realistic user transactions.
+
+### `frontend/` (Next.js / Node)
+*   **`src/app/page.tsx`**: The main entry view rendering the data table grid.
+*   **`src/app/items/[id]/page.tsx`**: The dynamic routing component for detailed individual product views.
+*   **`src/components/data-table.tsx`**: The core application component. Handles TanStack Table initialization, API fetching (with explicit `400ms` debouncing), and `@tanstack/react-virtual` DOM mapping to ensure complex 100,000+ datasets render without crashing.
+
+---
+
 ## Architectural Decisions & Performance Optimizations
 
 ### 1. **DOM Virtualization (Frontend)**
